@@ -1,14 +1,17 @@
+import sqlite3
 import pandas as pd
 import requests
 import datetime
+import sqlalchemy
 
 DATABASE_LOCATION = "sqlite:///my_played_tracks.sqlite"
 
 USER_ID = "luismerino"  # your Spotify username
 
-TOKEN = ("BQAs0iYOkQeQmRJxBLWgsO4vZOKwZb6gsVJzniKGhr7TfpIgSl8xyfihRLs3lwn3CyTPyDOg2CzId0ml_23_by"
-         "-xU5Jyj0v3FLjwrpQ9sywdVABLNhKiqOacBNiqAfijo54NVRLG_pln0tTem_7O00q7-a55Kc8"
-         "-Wg_nyEP201kin87TxImdSObj4Pxe1Izdac4meFtaVWrxOqKbiXVBfRW9YE0TTLtKefiXPECvSftZFX0ZkONhBzbU7Q")
+TOKEN = ("BQDtahbCAviW4N5jCR1bXYrfd"
+         "-_6WR1nFSKDxLIDcKMfIdqt3ToQZeI6rdRGyKusNUZr0kF77YeDeWQPTwldyiX50_PRI19xfSNzOETemyaqD_49js"
+         "-SlbWGUeTeBcF_JueVUw0hM45btefO1kfetaKZ"
+         "-AqXy04ZY0ImbXcNAYN3duOHtvQC1OqdXHjCwJkVtUbeJAjTIFG5isJXKmj5TUwZNVN5YBlCoruTByfgwN8xVa5E-WprISQjag")
 
 
 def get_recently_played_after_time(my_time, headers):
@@ -60,8 +63,12 @@ if __name__ == "__main__":
 
     # Download all songs you've listened to "after yesterday", which means in the last 24 hours
     print(" ####### Extracting your masterpieces from Spotify... #######")
-    request = get_recently_played_after_time(yesterday, headers)
-    response = request.json()
+    try:
+        request = get_recently_played_after_time(yesterday, headers)
+        response = request.json()
+    except Exception:
+        raise Exception("Error while fetching data, check your access token, request headers and request parameters")
+
     print(" ####### Extracted! Take a look to your last songs! #######")
 
     song_names = []
