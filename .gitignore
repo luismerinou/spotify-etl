@@ -168,3 +168,10 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+
+ .idea/dbnavigator.xml
+
+ .python-version
+
+ my_played_tracks.sqlite
