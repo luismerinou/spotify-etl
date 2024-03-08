@@ -8,15 +8,12 @@ DATABASE_LOCATION = "sqlite:///my_played_tracks.sqlite"
 
 USER_ID = "luismerino"  # your Spotify username
 
-TOKEN = ("BQDtahbCAviW4N5jCR1bXYrfd"
-         "-_6WR1nFSKDxLIDcKMfIdqt3ToQZeI6rdRGyKusNUZr0kF77YeDeWQPTwldyiX50_PRI19xfSNzOETemyaqD_49js"
-         "-SlbWGUeTeBcF_JueVUw0hM45btefO1kfetaKZ"
-         "-AqXy04ZY0ImbXcNAYN3duOHtvQC1OqdXHjCwJkVtUbeJAjTIFG5isJXKmj5TUwZNVN5YBlCoruTByfgwN8xVa5E-WprISQjag")
+TOKEN = ("BQBwVSkMze5vYEmILB02k07GVfy2FODB982_dkVDOibYLDBCjieVAdSPXWjTcevVhp1t1MSmdYoi58zjhU9drI0wCA0CBWkwGytJMVgnhN6Z8eE5yYcOhMgbEM6ORrBmsfLUwsWFmP-X2sFzAVozaWJ44TTqQL13gRTUvc8kWtYz5Kg_lz6Zfh--87p7GD5yUKx06-F6bBYGOXT-8JuYVElMa80pQnhDEh5zdytXmcwOOmy8WifbH2IF2A")
 
 
 def get_recently_played_after_time(my_time, headers):
     return requests.get(
-        "https://api.spotify.com/v1/me/player/recently-played?after={time}".format(time=yesterday_unix_timestamp),
+        "https://api.spotify.com/v1/me/player/recently-played?after={time}".format(time=my_time),
         headers=headers)
 
 
@@ -64,7 +61,7 @@ if __name__ == "__main__":
     # Download all songs you've listened to "after yesterday", which means in the last 24 hours
     print(" ####### Extracting your masterpieces from Spotify... #######")
     try:
-        request = get_recently_played_after_time(yesterday, headers)
+        request = get_recently_played_after_time(yesterday_unix_timestamp, headers)
         response = request.json()
     except Exception:
         raise Exception("Error while fetching data, check your access token, request headers and request parameters")
@@ -96,3 +93,34 @@ if __name__ == "__main__":
 
     if check_if_valid_data(song_df):
         print("####### Data valid, proceed to Load stage #######")
+
+    print("****** Starting load process ******")
+    engine = sqlalchemy.create_engine(DATABASE_LOCATION)
+    conn = sqlite3.connect('my_played_tracks.sqlite')
+    cursor = conn.cursor()
+
+    sql_query = """
+    CREATE TABLE IF NOT EXISTS my_played_tracks(
+        song_name VARCHAR(200),
+        artist_name VARCHAR(200),
+        played_at VARCHAR(200),
+        timestamp VARCHAR(200),
+        CONSTRAINT primary_key_constraint PRIMARY KEY (played_at)
+    )
+    """
+    try:
+        cursor.execute(sql_query)
+        print("Opened database successfully")
+    except Exception:
+        raise Exception("Error while executing SQL query")
+
+    try:
+        song_df.to_sql("my_played_tracks", engine, index=False, if_exists='append')
+    except Exception:
+        raise Exception("Data already exists in the database")
+
+    try:
+        conn.close()
+        print("Close database successfully")
+    except Exception:
+        raise Exception("Error while closing the connection to the database")
