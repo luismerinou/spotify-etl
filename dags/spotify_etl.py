@@ -1,22 +1,12 @@
-import sqlite3
-import pandas as pd
-import requests
-import datetime
 import sqlalchemy
-
-DATABASE_LOCATION = "sqlite:///my_played_tracks.sqlite"
-
-USER_ID = "luismerino"  # your Spotify username
-
-TOKEN = ("BQBXYU8DK2LZZt1EJI02cwYvKL6nYE3S2_OTCuZy49MFyrZci7a8d7JpTSM6PUGM1HIq-giOLYqxskqnr0XLYhMd4LVIE"
-         "-wuKjv0IqA1pp61l9mpcMupkKU3BdMvBsTfHFD-1svmggtXgzDMrCaMWJioqVqPwYzP39dYrsaZRiQrsFNK5NUvRx46iOor1_v0XKwPbFJ"
-         "-kvmYx6FXiSU5Llo1KLQ2aBR7etOsbh5n_gVmhBsf_fXZXp-WvQ")
-
-
-def get_recently_played_after_time(my_time, headers):
-    return requests.get(
-        "https://api.spotify.com/v1/me/player/recently-played?after={time}".format(time=my_time),
-        headers=headers)
+import pandas as pd
+from sqlalchemy.orm import sessionmaker
+import requests
+import json
+from datetime import datetime
+import datetime
+import sqlite3
+import logging
 
 
 def check_if_valid_data(df: pd.DataFrame) -> bool:
@@ -47,12 +37,28 @@ def check_if_valid_data(df: pd.DataFrame) -> bool:
     return True
 
 
-if __name__ == "__main__":
+def get_recently_played_after_time(my_time, headers):
+    return requests.get(
+        "https://api.spotify.com/v1/me/player/recently-played?after={time}".format(time=my_time),
+        headers=headers)
+
+
+def run_spotify_etl():
+    logger = logging.getLogger(__name__)
+
+    database_location = "sqlite:///my_played_tracks.sqlite"
+
+    user_id = "luismerino"  # your Spotify username
+
+    token = (
+        "BQBXYU8DK2LZZt1EJI02cwYvKL6nYE3S2_OTCuZy49MFyrZci7a8d7JpTSM6PUGM1HIq-giOLYqxskqnr0XLYhMd4LVIE"
+        "-wuKjv0IqA1pp61l9mpcMupkKU3BdMvBsTfHFD-1svmggtXgzDMrCaMWJioqVqPwYzP39dYrsaZRiQrsFNK5NUvRx46iOor1_v0XKwPbFJ"
+        "-kvmYx6FXiSU5Llo1KLQ2aBR7etOsbh5n_gVmhBsf_fXZXp-WvQ")
 
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": "Bearer {token}".format(token=TOKEN)
+        "Authorization": "Bearer {token}".format(token=token)
     }
 
     # Convert time to Unix timestamp in miliseconds
@@ -75,15 +81,12 @@ if __name__ == "__main__":
     played_at_list = []
     timestamps = []
 
-    try:
-        # Relevant fields only
-        for song in response["items"]:
-            song_names.append(song["track"]["name"])
-            artist_names.append(song["track"]["album"]["artists"][0]["name"])
-            played_at_list.append(song["played_at"])
-            timestamps.append(song["played_at"][0:10])
-    except KeyError:
-        raise KeyError("Items not found, check if your Spotify Access Token has expired and retry")
+    # Relevant fields only
+    for song in response["items"]:
+        song_names.append(song["track"]["name"])
+        artist_names.append(song["track"]["album"]["artists"][0]["name"])
+        played_at_list.append(song["played_at"])
+        timestamps.append(song["played_at"][0:10])
 
     # Prepare a dictionary in order to turn it into a pandas dataframe below
     song_dict = {
@@ -100,9 +103,12 @@ if __name__ == "__main__":
         print("####### Data valid, proceed to Load stage #######")
 
     print("****** Starting load process ******")
-    engine = sqlalchemy.create_engine(DATABASE_LOCATION)
+    engine = sqlalchemy.create_engine(database_location)
+    logger.info(f"connected to engine {engine}")
     conn = sqlite3.connect('my_played_tracks.sqlite')
+    logger.info(f"connected to DB {str(conn)}")
     cursor = conn.cursor()
+    logger.info(f" Load cursor {cursor}")
 
     sql_query = """
     CREATE TABLE IF NOT EXISTS my_played_tracks(
@@ -114,14 +120,18 @@ if __name__ == "__main__":
     )
     """
     try:
-        cursor.execute(sql_query)
+        logger.info(f" Executing QUERY {cursor.execute(sql_query)}")
         print("Opened database successfully")
     except Exception:
+        logger.info("Error while executing SQL query")
         raise Exception("Error while executing SQL query")
 
     try:
         song_df.to_sql("my_played_tracks", engine, index=False, if_exists='append')
+        logger.info("Created song df to sql")
+
     except Exception:
+        logger.info("!!!! [LOG] Data already exists in the database [LOG]")
         raise Exception("Data already exists in the database")
 
     try:
