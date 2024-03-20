@@ -3,37 +3,21 @@ import os
 import sqlite3
 
 import pandas as pd
-import requests
 import sqlalchemy
 
 from utils.transforms import check_if_valid_data
 
 from dotenv import load_dotenv
 
+from utils.api import get_recently_played_after_time
 from utils.date_utils import get_yesterday_unix
-
-
-def get_recently_played_after_time(my_time, headers):
-    return requests.get(
-        "https://api.spotify.com/v1/me/player/recently-played?after={time}".format(time=my_time),
-        headers=headers)
-
 
 if __name__ == "__main__":
     load_dotenv()
 
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": "Bearer {token}".format(token=os.getenv("TOKEN"))
-    }
-
     print(" ####### Extracting your masterpieces from Spotify... #######")
-    try:
-        request = get_recently_played_after_time(get_yesterday_unix(), headers)
-        response = request.json()
-    except Exception:
-        raise Exception("Error while fetching data, check your access token, request headers and request parameters")
+
+    response = get_recently_played_after_time(get_yesterday_unix())
 
     print(" ####### Extracted! Take a look to your last songs! #######")
 
@@ -65,6 +49,8 @@ if __name__ == "__main__":
 
     if check_if_valid_data(song_df):
         print("####### Data valid, proceed to Load stage #######")
+    else:
+        print("Invalid data")
 
     print("****** Starting load process ******")
     engine = sqlalchemy.create_engine(os.getenv("DATABASE_CONNECTION"))
