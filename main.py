@@ -3,48 +3,21 @@ import pandas as pd
 import requests
 import datetime
 import sqlalchemy
+from utils.transforms import check_if_valid_data
 
 DATABASE_LOCATION = "sqlite:///my_played_tracks.sqlite"
 
 USER_ID = "luismerino"  # your Spotify username
 
-TOKEN = ("BQBXYU8DK2LZZt1EJI02cwYvKL6nYE3S2_OTCuZy49MFyrZci7a8d7JpTSM6PUGM1HIq-giOLYqxskqnr0XLYhMd4LVIE"
-         "-wuKjv0IqA1pp61l9mpcMupkKU3BdMvBsTfHFD-1svmggtXgzDMrCaMWJioqVqPwYzP39dYrsaZRiQrsFNK5NUvRx46iOor1_v0XKwPbFJ"
-         "-kvmYx6FXiSU5Llo1KLQ2aBR7etOsbh5n_gVmhBsf_fXZXp-WvQ")
+TOKEN = ("BQDuI1VJQbJ51JB-WTxdN5jgveyckVVK9GlLEbVdDuJToW9_WDgatNV5541Ic1TsaYhwjnaaGAdXHlJhphC9cMkz1upSV-MV"
+         "-ll7G0Jx6AaFSv8pYY24PKnDIYt"
+         "-gQ6TdjkM5QAtCXa_VxqyRvGk4V_5koSW18tKhaAOmGdTQ4TChWQtYQswK0FyxgD78XpdLD24_D9yCjJHupoFin2HwbjCZgevW54Gk77UCq49qcULApklJnZnwADwGQ")
 
 
 def get_recently_played_after_time(my_time, headers):
     return requests.get(
         "https://api.spotify.com/v1/me/player/recently-played?after={time}".format(time=my_time),
         headers=headers)
-
-
-def check_if_valid_data(df: pd.DataFrame) -> bool:
-    # Check if dataframe is empty
-    if df.empty:
-        print("No songs downloaded. Finishing execution")
-        return False
-
-        # Primary Key Check
-    if pd.Series(df['played_at']).is_unique:
-        pass
-    else:
-        raise Exception("Primary Key check is violated")
-
-    # Check for nulls
-    if df.isnull().values.any():
-        raise Exception("Null values found")
-
-    # Check that all timestamps are of yesterday's date
-    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
-    yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
-
-    timestamps = df["timestamp"].tolist()
-    for timestamp in timestamps:
-        if datetime.datetime.strptime(timestamp, '%Y-%m-%d') != yesterday:
-            raise Exception("At least one of the returned songs does not have a yesterday's timestamp")
-
-    return True
 
 
 if __name__ == "__main__":
