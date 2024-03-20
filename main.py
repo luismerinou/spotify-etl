@@ -10,6 +10,8 @@ from utils.transforms import check_if_valid_data
 
 from dotenv import load_dotenv
 
+from utils.date_utils import get_yesterday_unix
+
 
 def get_recently_played_after_time(my_time, headers):
     return requests.get(
@@ -26,15 +28,9 @@ if __name__ == "__main__":
         "Authorization": "Bearer {token}".format(token=os.getenv("TOKEN"))
     }
 
-    # Convert time to Unix timestamp in miliseconds
-    today = datetime.datetime.now()
-    yesterday = today - datetime.timedelta(days=1)
-    yesterday_unix_timestamp = int(yesterday.timestamp()) * 1000
-
-    # Download all songs you've listened to "after yesterday", which means in the last 24 hours
     print(" ####### Extracting your masterpieces from Spotify... #######")
     try:
-        request = get_recently_played_after_time(yesterday_unix_timestamp, headers)
+        request = get_recently_played_after_time(get_yesterday_unix(), headers)
         response = request.json()
     except Exception:
         raise Exception("Error while fetching data, check your access token, request headers and request parameters")
