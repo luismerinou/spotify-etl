@@ -1,17 +1,14 @@
+import datetime
+import os
 import sqlite3
+
 import pandas as pd
 import requests
-import datetime
 import sqlalchemy
+
 from utils.transforms import check_if_valid_data
 
-DATABASE_LOCATION = "sqlite:///my_played_tracks.sqlite"
-
-USER_ID = "luismerino"  # your Spotify username
-
-TOKEN = ("BQDuI1VJQbJ51JB-WTxdN5jgveyckVVK9GlLEbVdDuJToW9_WDgatNV5541Ic1TsaYhwjnaaGAdXHlJhphC9cMkz1upSV-MV"
-         "-ll7G0Jx6AaFSv8pYY24PKnDIYt"
-         "-gQ6TdjkM5QAtCXa_VxqyRvGk4V_5koSW18tKhaAOmGdTQ4TChWQtYQswK0FyxgD78XpdLD24_D9yCjJHupoFin2HwbjCZgevW54Gk77UCq49qcULApklJnZnwADwGQ")
+from dotenv import load_dotenv
 
 
 def get_recently_played_after_time(my_time, headers):
@@ -21,11 +18,12 @@ def get_recently_played_after_time(my_time, headers):
 
 
 if __name__ == "__main__":
+    load_dotenv()
 
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": "Bearer {token}".format(token=TOKEN)
+        "Authorization": "Bearer {token}".format(token=os.getenv("TOKEN"))
     }
 
     # Convert time to Unix timestamp in miliseconds
@@ -73,7 +71,7 @@ if __name__ == "__main__":
         print("####### Data valid, proceed to Load stage #######")
 
     print("****** Starting load process ******")
-    engine = sqlalchemy.create_engine(DATABASE_LOCATION)
+    engine = sqlalchemy.create_engine(os.getenv("DATABASE_CONNECTION"))
     conn = sqlite3.connect('my_played_tracks.sqlite')
     cursor = conn.cursor()
 
