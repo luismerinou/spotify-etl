@@ -22,9 +22,10 @@ def check_if_valid_data(df: pd.DataFrame) -> bool:
     for timestamp in timestamps:
         if datetime.strptime(timestamp, '%Y-%m-%d') != get_yesterday():
             not_yesterday.append(timestamp)
+           # raise Exception("At least one of the returned songs does not have a yesterday's timestamp")
 
     return is_empty(not_yesterday)
 
 
 def is_empty(my_list: list) -> bool:
-    return len(my_list) > 0
+    return len(my_list) < 0
