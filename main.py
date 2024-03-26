@@ -2,14 +2,15 @@ import os
 import sqlite3
 
 import pandas as pd
-import sqlalchemy
 
-from utils.transforms import check_if_valid_data
+from etl.transforms import check_if_valid_data
 
 from dotenv import load_dotenv
 
 from utils.api import get_recently_played_after_time
 from utils.date_utils import get_yesterday_unix
+from etl.load import load_sqlLite
+
 
 if __name__ == "__main__":
     load_dotenv()
@@ -48,36 +49,9 @@ if __name__ == "__main__":
 
     if check_if_valid_data(song_df):
         print("####### Data valid, proceed to Load stage #######")
+        load_sqlLite(song_df, to_s3=True)
     else:
         print("Invalid data")
 
-    print("****** Starting load process ******")
-    engine = sqlalchemy.create_engine(os.getenv("DATABASE_CONNECTION"))
-    conn = sqlite3.connect('my_played_tracks.sqlite')
-    cursor = conn.cursor()
 
-    sql_query = """
-    CREATE TABLE IF NOT EXISTS my_played_tracks(
-        song_name VARCHAR(200),
-        artist_name VARCHAR(200),
-        played_at VARCHAR(200),
-        timestamp VARCHAR(200),
-        CONSTRAINT primary_key_constraint PRIMARY KEY (played_at)
-    )
-    """
-    try:
-        cursor.execute(sql_query)
-        print("Opened database successfully")
-    except Exception:
-        raise Exception("Error while executing SQL query")
 
-    try:
-        song_df.to_sql("my_played_tracks", engine, index=False, if_exists='append')
-    except Exception:
-        raise Exception("Data already exists in the database")
-
-    try:
-        conn.close()
-        print("Close database successfully")
-    except Exception:
-        raise Exception("Error while closing the connection to the database")
