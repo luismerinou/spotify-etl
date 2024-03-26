@@ -14,7 +14,7 @@ default_args = {
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=1)
+    'retry_delay': timedelta(seconds=1)
 }
 
 dag = DAG(
@@ -29,3 +29,5 @@ run_etl = PythonOperator(
     python_callable=run_spotify_etl,
     dag=dag,
 )
+
+run_etl
