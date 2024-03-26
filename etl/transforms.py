@@ -11,7 +11,7 @@ def check_if_valid_data(df: pd.DataFrame) -> bool:
         return False
 
     if not pd.Series(df['played_at']).is_unique:
-        raise KeyError(f"Primaray Key is vioalated: {df['played_at']} is duplicated")
+        raise KeyError(f"Primary Key is violated: {df['played_at']} is duplicated")
 
     # Check for nulls
     if df.isnull().values.any():
