@@ -56,7 +56,7 @@ def {artist.lower().replace(" ", "_")}_count():
 
 with ui.layout_columns():
     with ui.card():
-        ui.card_header("Summary statistics")
+        ui.card_header("Summary")
 
 
         @render.data_frame
