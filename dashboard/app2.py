@@ -9,8 +9,7 @@ from faicons import icon_svg as icon
 
 sns.set_theme(style="white")
 df = pd.read_csv(Path(__file__).parent / "my_played_songs.csv", na_values="NA")
-# artists = [artist for artist in df["artist_name"].unique()]
-artists = ["Taylor Swift", "Jaime Swift", "Luis Swift"]
+artists = [artist for artist in df["artist_name"].unique()]
 print(df)
 
 
@@ -72,7 +71,7 @@ with ui.layout_columns():
             return render.DataGrid(display_df, filters=True)
 
     with ui.card():
-        ui.card_header("Artist")
+        ui.card_header("Artists throughout time")
 
 
         @render.plot
