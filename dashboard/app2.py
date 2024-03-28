@@ -10,6 +10,7 @@ from faicons import icon_svg as icon
 sns.set_theme(style="white")
 df = pd.read_csv(Path(__file__).parent / "my_played_songs.csv", na_values="NA")
 artists = [artist for artist in df["artist_name"].unique()]
+dates = sorted([date for date in df["timestamp"].unique()], reverse=True)
 print(df)
 
 
@@ -36,23 +37,27 @@ with ui.layout_columns():
 
 with ui.sidebar():
     ui.input_checkbox_group("artists", "Filter by artist", artists, selected=artists)
+    ui.input_checkbox_group("date", "Filter by date", dates, selected=dates[0])
 
 
 @reactive.calc
 def filtered_df() -> pd.DataFrame:
     filt_df = df[df["artist_name"].isin(input.artists())]
+    filt_df = filt_df[filt_df["timestamp"].isin(input.date())]
     return filt_df
 
 
 with ui.layout_columns():
     for index, artist in enumerate(artists):
-        with ui.value_box(theme="primary", value=artist):
-            f"#{index+1}"
+        songs = count_songs_by_artist(df, artist)
+        with ui.value_box(theme="primary", value=songs):
+            artist
             exec(f"""
 @render.text
 def {artist.lower().replace(" ", "_")}_count():
     pass
 """)
+
 
 with ui.layout_columns():
     with ui.card():
