@@ -175,3 +175,7 @@ cython_debug/
  .python-version
 
  my_played_tracks.sqlite
+
+.DS_Store
+
+*.iml
