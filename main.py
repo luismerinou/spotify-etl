@@ -30,9 +30,5 @@ if __name__ == "__main__":
         print("####### Data valid, proceed to Load stage #######")
         load_sqlLite(song_df, to_s3=True)
     else:
-        raise Exception(
-            "####### Data invalid, probably not containing data only from yesterday {}\n but today is {}, not loaded to any "
-            "data storage system #######".format(get_yesterday_human(), get_today_human()))
-
-
+        raise Exception("Error throughout ETL process")
 
