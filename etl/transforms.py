@@ -32,5 +32,12 @@ def check_if_valid_data(df: pd.DataFrame) -> bool:
     return is_empty(not_yesterday)
 
 
+def transform_input_data(df: pd.DataFrame) -> pd.DataFrame:
+    if check_if_valid_data(df):
+        return df
+    else:
+        raise Exception("####### Unexpected invalid data ######")
+
+
 def is_empty(my_list: list) -> bool:
     return len(my_list) == 0

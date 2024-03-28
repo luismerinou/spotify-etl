@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from etl.transforms import check_if_valid_data
+from etl.transforms import check_if_valid_data, transform_input_data
 
 from dotenv import load_dotenv
 
@@ -26,9 +26,8 @@ if __name__ == "__main__":
     song_df = extract_from_api(response)
     print(song_df)
 
-    if check_if_valid_data(song_df):
-        print("####### Data valid, proceed to Load stage #######")
-        load_sqlLite(song_df, to_s3=True)
-    else:
-        raise Exception("Error throughout ETL process")
+    data_to_save = transform_input_data(song_df)
 
+    print("####### Data valid, proceed to Load stage #######")
+
+    load_sqlLite(data_to_save, to_s3=True)
