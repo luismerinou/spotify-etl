@@ -1,11 +1,9 @@
 import os
 
 import requests
-# from utils.auth import get_token
 
 
 def get_recently_played_after_time(unix_date: int) -> requests.Response:
-    # token = get_token()
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
