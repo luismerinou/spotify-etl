@@ -26,12 +26,16 @@ def count_artist(data_frame: pd.DataFrame) -> int:
     return data_frame["artist_name"].unique().shape[0]
 
 
+with ui.value_box(showcase=icon("clock-rotate-left")):
+    "Period"
+    f"From {df.iloc[0, 3]} to {df.iloc[df.shape[0] - 1, 3]}"
+
 with ui.layout_columns():
-    with ui.value_box(showcase=icon("spotify"), full_screen=False):
+    with ui.value_box(showcase=icon("spotify")):
         "Total artists"
         count_artist(df)
 
-    with ui.value_box(showcase=icon("music"), full_screen=False):
+    with ui.value_box(showcase=icon("music")):
         "Total songs"
         count_songs(df)
 
@@ -57,7 +61,6 @@ with ui.layout_columns():
 def {artist.lower().replace(" ", "_")}_count():
     pass
 """)
-
 
 with ui.layout_columns():
     with ui.card():
