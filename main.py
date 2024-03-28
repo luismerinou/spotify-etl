@@ -27,7 +27,13 @@ if __name__ == "__main__":
     print(song_df)
 
     data_to_save = transform_input_data(song_df)
+    data_to_save.to_csv("dashboard/my_played_songs.csv")
 
     print("####### Data valid, proceed to Load stage #######")
 
     load_sqlLite(data_to_save, to_s3=True)
+
+
+def get_df() -> pd.DataFrame:
+    load_dotenv()
+    return transform_input_data(extract_from_api(get_recently_played_after_time(get_yesterday_unix())))
