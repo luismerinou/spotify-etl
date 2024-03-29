@@ -1,5 +1,7 @@
 # Spotify ETL with Shiny  
-This repository aims to build your own Spotify Wrapped. It uses [Spotify Web API](https://developer.spotify.com/documentation/web-api) to retrieve your information and plotting it with [Shiny](https://shiny.posit.co/py/).
+This repository aims to build your own Spotify Wrapped. It uses [Spotify Web API](https://developer.spotify.com/documentation/web-api) to retrieve your information and plotting it with [Shiny](https://shiny.posit.co/py/). 🚀
+
+It also include integration with [AWS S3](https://aws.amazon.com/es/s3/) 🌥️ and loading files to S3 buckets. 🪣
 
 My own wrapped is available here [https://luismerinoulizarna.shinyapps.io/my-music-wrapped/](https://luismerinoulizarna.shinyapps.io/my-music-wrapped/)
 
@@ -10,7 +12,7 @@ My own wrapped is available here [https://luismerinoulizarna.shinyapps.io/my-mus
 * Under `~/dashboard` run `shiny run --reload --launch-browser ./app.py`
 
 # Example
-You should see something like this:
+You should see something like this: ✨
 
 
 https://github.com/luismerinou/spotify-etl/assets/64010057/77744ed1-ac5f-4415-8e91-2611645f48d9
