@@ -9,3 +9,11 @@ My own wrapped is available here [https://luismerinoulizarna.shinyapps.io/my-mus
 * Run `pip install -r requirements.txt` to install all required requirements for the project.
 * Under `~/dashboard` run `shiny run --reload --launch-browser ./app.py`
 
+# Example
+You should see something like this:
+
+
+https://github.com/luismerinou/spotify-etl/assets/64010057/77744ed1-ac5f-4415-8e91-2611645f48d9
+
+
+
