@@ -2,7 +2,7 @@ sqlalchemy==2.0.28
 pip==24.0
 requests==2.31.0
 python-dotenv~=1.0.1
-boto3==1.34.70
+boto3==1.34.108
 shiny
 seaborn
 pandas
